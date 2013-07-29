@@ -70,20 +70,22 @@ class Router(object):
     def __init__(self):
         self.r_conn = r_conn
 
-    def generate_queue_key(self, route_key, route_value):
+    @classmethod
+    def queue_key(cls, route_key, route_value):
         return 'tattletale-queue-%s::%s' % (route_key, route_value)
 
-    def generate_channel_key(self, route_key, route_value):
+    @classmethod
+    def channel_key(cls, route_key, route_value):
         return 'tattletale-channel-%s::%s' % (route_key, route_value)
 
     def route(self, message_id, routing_key):
         with self.r_conn.pipeline() as pipe:
             for route_key, route_value in routing_key.iteritems():
-                pipe.lpush(self.generate_queue_key(route_key, route_value),
+                pipe.lpush(type(self).queue_key(route_key, route_value),
                            message_id)
-                pipe.ltrim(self.generate_queue_key(route_key, route_value),
+                pipe.ltrim(type(self).queue_key(route_key, route_value),
                            0, MAX_QUEUE_LENGTH)
-                pipe.publish(self.generate_channel_key(route_key, route_value),
+                pipe.publish(type(self).channel_key(route_key, route_value),
                              message_id)
             pipe.execute()
 
