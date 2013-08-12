@@ -24,6 +24,7 @@ class MessageResource(Resource):
     uuid = fields.CharField(attribute='uuid', readonly=True)
     text = fields.CharField(attribute='text')
     publisher = fields.CharField(attribute='publisher')
+    timestamp = fields.CharField(attribute='timestamp')
     routing_key = fields.CharField(attribute='routing_key')
 
     class Meta:

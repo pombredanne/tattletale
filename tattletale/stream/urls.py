@@ -12,11 +12,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns(
     '',
-    (r'^api/', include('tattletale.api.urls')),
-    (r'^stream/', include('tattletale.stream.urls')),
+    url(r'^(?P<exchange_name>\w+)/$', 'tattletale.stream.views.tattler_stream',
+        name='tattler-stream'),
 )
-

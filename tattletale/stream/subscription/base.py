@@ -21,24 +21,32 @@ from tattletale import r_conn
 
 class SubscriptionSource(object):
 
-    def subscribe_user_to_channel(self, user_id, route_key, route_value):
+    def subscribe_user_to_channel(self, user_id, exchange_name, route_key,
+                                  route_value, role):
         raise NotImplementedError
 
-    def unsubscribe_user_from_channel(self, user_id, route_key, route_value):
+    def unsubscribe_user_from_channel(self, user_id, exchange_name, route_key,
+                                      route_value):
         raise NotImplementedError
 
-    def get_subscriptions_for_user(self, user_id):
+    def get_subscriptions_for_user(self, user_id, exchange_name):
+        raise NotImplementedError
+
+    def get_role_for_subscription(self, user_id, exchange_name, route_key,
+                                  route_value):
         raise NotImplementedError
 
     @classmethod
-    def channel_for_user(cls, user_id):
-        return 'tattletale-user-%s' % user_id
+    def channel_for_user(cls, user_id, exchange_name):
+        return 'tattletale-user-%s::%s' % (exchange_name, user_id)
 
-    def announce_subscription_change(self, user_id, add_or_remove, route_key,
+    def announce_subscription_change(self, user_id, add_or_remove,
+                                     exchange_name, route_key,
                                      route_value):
-        r_conn.publish(type(self).channel_for_user(user_id),
+        r_conn.publish(type(self).channel_for_user(user_id, exchange_name),
                        json.dumps(dict(user_id=user_id,
                                        add_or_remove=add_or_remove,
+                                       exchange_name=exchange_name,
                                        route_key=route_key,
                                        route_value=route_value)))
 
